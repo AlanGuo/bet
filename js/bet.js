@@ -1,5 +1,7 @@
 var total,
-    betAmount,
+    bigBetAmount,
+    smallBetAmount,
+    baoziBetAmount,
     //0 = 大, 1 = 小, 3，4，5，6 = 豹子
     betOptions,
     totalWin,
@@ -8,7 +10,9 @@ var total,
 
 //初始化
 var totalElem = document.getElementById('total'),
-    betAmountElem = document.getElementById('amount'),
+    bigAmountElem = document.getElementById('big-amount'),
+    smallAmountElem = document.getElementById('small-amount'),
+    baoziAmountElem = document.getElementById('baozi-amount'),
     diceElemArray = document.getElementById('dice-ul').querySelectorAll('li'),
     bigRadio = document.getElementById('big'),
     smallRadio = document.getElementById('small'),
@@ -19,8 +23,10 @@ var totalElem = document.getElementById('total'),
     luckResult = document.getElementById('luck-result')
 
 function init(){
-    total = 20000
-    betAmount = 100
+    total = 10000
+    bigBetAmount = 100,
+    smallBetAmount = 100,
+    baoziBetAmount = 100,
     //0 = 大, 1 = 小, 3，4，5，6 = 豹子
     betOptions = -1
     totalWin = 0
@@ -28,16 +34,24 @@ function init(){
     maxBet = 0
     resultUl.innerHTML = ''
 }
+
+init()
 //开局
 function go() {
-    betAmount = betAmountElem.value * 1
-    maxBet = betAmount>maxBet?betAmount:maxBet
+    bigBetAmount = bigAmountElem.value * 1
+    smallBetAmount = smallAmountElem.value * 1
+    baoziBetAmount = baoziAmountElem.value * 1
+
+    maxBet = bigBetAmount>maxBet?bigBetAmount:maxBet
+    maxBet = smallBetAmount>maxBet?smallBetAmount:maxBet
+    maxBet = baoziBetAmount>maxBet?baoziBetAmount:maxBet
+
     betOptions = -1
-    if(total - betAmount <= 0){
-        console.log('赌本不足')
+    if((total - bigBetAmount -smallBetAmount-baoziBetAmount)  <= 0){
+        //console.log('赌本不足')
         return -1;
     }
-    if((bigRadio.checked || smallRadio.checked || baoziRadio.checked) && betAmount>=100){
+    if((bigRadio.checked || smallRadio.checked || baoziRadio.checked) && bigBetAmount>=100 && smallBetAmount>=100 && baoziBetAmount>=100){
         if(baoziRadio.checked){
             betOptions = baoziInput.value * 1
             if(betOptions >=3 && betOptions <=6){
@@ -77,12 +91,12 @@ function go() {
                 //win
                 totalWin++
                 resultString += ', win'
-                total += betAmount
+                total += baoziBetAmount*10
             }
             else{
                 totalLose++
                 resultString += ', lose'
-                total -= betAmount
+                total -= baoziBetAmount
             }
         }
 
@@ -93,12 +107,12 @@ function go() {
             if(!baozi && result >= 11){
                 totalWin++
                 resultString += ', win'
-                total += betAmount
+                total += bigBetAmount
             }
             else{
                 totalLose++
                 resultString += ', lose'
-                total -= betAmount
+                total -= bigBetAmount
             }
         }
 
@@ -109,17 +123,17 @@ function go() {
                 //win
                 totalWin++
                 resultString += ', win'
-                total += betAmount
+                total += smallBetAmount
             }
             else{
                 totalLose++
                 resultString += ', lose'
-                total -= betAmount
+                total -= smallBetAmount
             }
         }
         
         if(resultArray[0] == resultArray[1] &&  resultArray[1] == resultArray[2]){
-            console.log(resultArray)
+            //console.log(resultArray)
             resultUl.innerHTML += '<li style="color:red">'+resultArray[0]+'+'+resultArray[1]+'+'+resultArray[2]+'='+result+' '+resultString+'</li>'
         }
         else{
@@ -137,14 +151,29 @@ var totalGoodLuck = 0,
     totalBadLuck = 0
 
 function win(){
-    var target = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
-    //压大
+    var target = []
+    for(var i=0;i<10;i++){
+        target.push(1)
+    }
+    //押大，押小
     bigRadio.checked = true
-    
+    smallRadio.checked = true
+
     init()
     var recursiveBet = function(){
         if(target.length){
-            betAmountElem.value = (target[0] + target[target.length-1])*100
+            if(target.length == 1){
+                //大
+                bigAmountElem.value = (target[0])*100
+                //小
+                smallAmountElem.value = (target[0])*100
+            }
+            else{
+                //大
+                bigAmountElem.value = (target[0] + target[target.length-1])*100
+                //小
+                smallAmountElem.value = (target[0] + target[target.length-1])*100
+            }
 
             var r = go()
             if(r == 1){

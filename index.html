@@ -11,7 +11,7 @@
 <body>
     <div class="my">
         我的本金：
-        <span id="total">10000</span>
+        <span id="total"></span>
     </div>
     <h2 class="title">骰子</h2>
     <div class="dice-wrapper">
@@ -23,11 +23,13 @@
     </div>
     <h2 class="title">投注区</h2>
     <div class="bet-wrapper">
-        <input type="radio" name="betoption" id="big"><label for="big">大</label>
-        <input type="radio" name="betoption" id="small"><label for="small">小</label>
-        <input type="radio" name="betoption" id="baozi">
+        <input type="checkbox" name="betoption" id="big"><label for="big">大</label>
+        <input id="big-amount" type="number" value="100">
+        <input type="checkbox" name="betoption" id="small"><label for="small">小</label>
+        <input id="small-amount" type="number" value="100">
+        <input type="checkbox" name="betoption" id="baozi">
         <input type="number" min=1 max=6 id="baozi-input"><label for="baozi">豹子</label>
-        <label>赌注：</label><input id="amount" type="number" value="100">
+        <input id="baozi-amount" type="number" value="100">
     </div>
     <div class="operation-wrapper">
         <button onclick="go(event)">Go</button>
