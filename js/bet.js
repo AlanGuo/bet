@@ -59,7 +59,7 @@ function go() {
             }
             else{
                 console.log('非法豹子')
-                return -2;
+                return -2
             }
         }
         //出结果
@@ -67,6 +67,7 @@ function go() {
             resultArray =[],
             resultString = '',
             baozi = false
+
         for(var i=0;i<diceElemArray.length;i++){
             var num = Math.floor(Math.random()*6+1)
             diceElemArray[i].innerText = num
@@ -77,11 +78,9 @@ function go() {
         if(resultArray[0] == resultArray[1] && resultArray[1] == resultArray[2]){
             resultString = '豹子:'+betOptions
             baozi = true
-        }
-        else if(result >= 11){
+        }else if(result >= 11){
             resultString = '大'
-        }
-        else{
+        }else{
             resultString = '小'
         }
 
@@ -90,28 +89,28 @@ function go() {
             if(betOptions == resultArray[0] && betOptions == resultArray[1] && betOptions == resultArray[2]){
                 //win
                 totalWin++
-                resultString += ', win'
+                resultString += ', 豹子:win'
                 total += baoziBetAmount*10
-            }
-            else{
+            }else{
+                //lose
                 totalLose++
-                resultString += ', lose'
+                resultString += ', 豹子:lose'
                 total -= baoziBetAmount
             }
         }
-
 
         //大
         if(bigRadio.checked){
             betOptions = 0
             if(!baozi && result >= 11){
+                //win
                 totalWin++
-                resultString += ', win'
+                resultString += ', 大:win'
                 total += bigBetAmount
-            }
-            else{
+            }else{
+                //lose
                 totalLose++
-                resultString += ', lose'
+                resultString += ', 大:lose'
                 total -= bigBetAmount
             }
         }
@@ -122,12 +121,12 @@ function go() {
             if(!baozi && result < 11){
                 //win
                 totalWin++
-                resultString += ', win'
+                resultString += ', 小:win'
                 total += smallBetAmount
-            }
-            else{
+            }else{
+                //lose
                 totalLose++
-                resultString += ', lose'
+                resultString += ', 小:lose'
                 total -= smallBetAmount
             }
         }
@@ -135,8 +134,7 @@ function go() {
         if(resultArray[0] == resultArray[1] &&  resultArray[1] == resultArray[2]){
             //console.log(resultArray)
             resultUl.innerHTML += '<li style="color:red">'+resultArray[0]+'+'+resultArray[1]+'+'+resultArray[2]+'='+result+' '+resultString+'</li>'
-        }
-        else{
+        }else{
             resultUl.innerHTML += '<li>'+resultArray[0]+'+'+resultArray[1]+'+'+resultArray[2]+'='+result+' '+resultString+'</li>'
         }
         totalElem.innerText = total
@@ -146,14 +144,14 @@ function go() {
     }
 }
 
-
 var totalGoodLuck = 0,
     totalBadLuck = 0
 
 function win(){
-    var target = []
+    var targetBig = [], targetSmall = []
     for(var i=0;i<10;i++){
-        target.push(1)
+        targetBig.push(1)
+        targetSmall.push(1)
     }
     //押大，押小
     bigRadio.checked = true
@@ -164,30 +162,38 @@ function win(){
         if(target.length){
             if(target.length == 1){
                 //大
-                bigAmountElem.value = (target[0])*100
+                bigAmountElem.value = (targetBig[0])*100
                 //小
-                smallAmountElem.value = (target[0])*100
-            }
-            else{
+                smallAmountElem.value = (targetSmall[0])*100
+            }else{
                 //大
-                bigAmountElem.value = (target[0] + target[target.length-1])*100
+                bigAmountElem.value = (targetBig[0] + targetBig[targetBig.length-1])*100
                 //小
-                smallAmountElem.value = (target[0] + target[target.length-1])*100
+                smallAmountElem.value = (targetSmall[0] + targetSmall[targetSmall.length-1])*100
             }
 
             var r = go()
-            if(r == 1){
-                target.shift()
-                target.pop()
-            }
-            else if(r == -1){
+            if(r == -1){
                 //停止模拟
                 totalBadLuck++
                 return;
+            }else{
+                //大
+                if(r[0] == 1){
+                    targetBig.shift()
+                    targetBig.pop()
+                }else{
+                    targetBig.push(targetBig[0] + targetBig[targetBig.length-1])
+                }
+                //小
+                if(r[1] == 1){
+                    targetSmall.shift()
+                    targetSmall.pop()
+                }else{
+                    targetSmall.push(targetSmall[0] + targetSmall[targetSmall.length-1])
+                }
             }
-            else{
-                target.push(target[0] + target[target.length-1])
-            }
+            
             //模拟下注
             recursiveBet()
         }
