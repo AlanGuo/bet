@@ -159,7 +159,7 @@ function win(){
     var targetBig = [], targetSmall = []
     for(var i=0;i<10;i++){
         targetBig.push(1)
-        //targetSmall.push(1)
+        targetSmall.push(1)
     }
 
     init()
