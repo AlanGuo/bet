@@ -46,12 +46,14 @@ function go() {
     maxBet = smallBetAmount>maxBet?smallBetAmount:maxBet
     maxBet = baoziBetAmount>maxBet?baoziBetAmount:maxBet
 
+    var r = [-1,-1,-1]
+
     betOptions = -1
     if((total - bigBetAmount -smallBetAmount-baoziBetAmount)  <= 0){
         //console.log('赌本不足')
-        return -1;
+        return -1
     }
-    if((bigRadio.checked || smallRadio.checked || baoziRadio.checked) && bigBetAmount>=100 && smallBetAmount>=100 && baoziBetAmount>=100){
+    if((bigRadio.checked || smallRadio.checked || baoziRadio.checked) && (bigBetAmount>=100 || smallBetAmount>=100 || baoziBetAmount>=100)){
         if(baoziRadio.checked){
             betOptions = baoziInput.value * 1
             if(betOptions >=3 && betOptions <=6){
@@ -91,11 +93,13 @@ function go() {
                 totalWin++
                 resultString += ', 豹子:win'
                 total += baoziBetAmount*10
+                r[2] = 1
             }else{
                 //lose
                 totalLose++
                 resultString += ', 豹子:lose'
                 total -= baoziBetAmount
+                r[2] = 0
             }
         }
 
@@ -107,11 +111,13 @@ function go() {
                 totalWin++
                 resultString += ', 大:win'
                 total += bigBetAmount
+                r[0] = 1
             }else{
                 //lose
                 totalLose++
                 resultString += ', 大:lose'
                 total -= bigBetAmount
+                r[0] = 0
             }
         }
 
@@ -123,11 +129,13 @@ function go() {
                 totalWin++
                 resultString += ', 小:win'
                 total += smallBetAmount
+                r[1] = 1
             }else{
                 //lose
                 totalLose++
                 resultString += ', 小:lose'
                 total -= smallBetAmount
+                r[1] = 0
             }
         }
         
@@ -140,7 +148,7 @@ function go() {
         totalElem.innerText = total
         resultSum.innerText = 'all: '+(totalWin+totalLose) + ', win: '+totalWin + ', lose: '+ totalLose+', maxBet: '+maxBet
 
-        return /win/i.test(resultString)
+        return r
     }
 }
 
@@ -151,53 +159,69 @@ function win(){
     var targetBig = [], targetSmall = []
     for(var i=0;i<10;i++){
         targetBig.push(1)
-        targetSmall.push(1)
+        //targetSmall.push(1)
     }
-    //押大，押小
-    bigRadio.checked = true
-    smallRadio.checked = true
 
     init()
     var recursiveBet = function(){
-        if(target.length){
-            if(target.length == 1){
+        if(targetBig.length){
+            //押大
+            bigRadio.checked = true
+            //大
+            if(targetBig.length == 1){
                 //大
                 bigAmountElem.value = (targetBig[0])*100
-                //小
-                smallAmountElem.value = (targetSmall[0])*100
             }else{
                 //大
                 bigAmountElem.value = (targetBig[0] + targetBig[targetBig.length-1])*100
+            }
+        }
+        else{
+            bigAmountElem.value = 0
+            bigRadio.checked = false
+        }
+        if(targetSmall.length){
+            //押小
+            smallRadio.checked = true
+            //小
+            if(targetSmall.length == 1){
+                //小
+                smallAmountElem.value = (targetSmall[0])*100
+            }else{
                 //小
                 smallAmountElem.value = (targetSmall[0] + targetSmall[targetSmall.length-1])*100
             }
+        }
+        else{
+            smallRadio.checked = false
+            smallAmountElem.value = 0
+        }
 
+        if(targetBig.length || targetSmall.length){
             var r = go()
             if(r == -1){
                 //停止模拟
                 totalBadLuck++
-                return;
+                return
             }else{
                 //大
                 if(r[0] == 1){
                     targetBig.shift()
                     targetBig.pop()
-                }else{
+                }else if(r[0] == 0){
                     targetBig.push(targetBig[0] + targetBig[targetBig.length-1])
                 }
                 //小
                 if(r[1] == 1){
                     targetSmall.shift()
                     targetSmall.pop()
-                }else{
+                }else if(r[1] == 0){
                     targetSmall.push(targetSmall[0] + targetSmall[targetSmall.length-1])
                 }
             }
-            
             //模拟下注
             recursiveBet()
-        }
-        else{
+        }else{
             totalGoodLuck++
         }
     }
